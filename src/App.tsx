@@ -39,9 +39,11 @@ export default function App() {
     setRoute(path);
   };
 
+  const base = import.meta.env.BASE_URL;
+
   // Admin route
-  if (route === "/admin") {
-    return <AdminPanel onBack={() => navigate("/")} />;
+  if (route === `${base}admin`) {
+    return <AdminPanel onBack={() => navigate(base)} />;
   }
   const [dashboardStats, setDashboardStats] = useState({
     insights_generated: 0,
@@ -53,13 +55,13 @@ export default function App() {
   const [caseFilter, setCaseFilter] = useState<string>("all");
 
   useEffect(() => {
-    fetch("/api/cases").then(r => r.json()).then(d => setCases(d)).catch(() => {});
+    fetch(`${base}api/cases`).then(r => r.json()).then(d => setCases(d)).catch(() => {});
   }, []);
 
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const r = await fetch("/api/dashboard-stats");
+        const r = await fetch(`${base}api/dashboard-stats`);
         const d = await r.json();
         if (d) setDashboardStats(d);
       } catch {}

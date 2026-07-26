@@ -49,14 +49,19 @@ async function fetchWithRetry(url: string, init: RequestInit, retries: number = 
 }
 
 async function initDatabase() {
-  // Create database if not exists
+  // Create database if not exists (ignore if already exists or insufficient privileges)
   const conn = await mysql.createConnection({
     host: MYSQL_HOST,
     port: MYSQL_PORT,
     user: MYSQL_USER,
     password: MYSQL_PASSWORD,
   });
-  await conn.query(`CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
+  try {
+    await conn.query(`CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
+  } catch (e: any) {
+    if (e.code !== 'ER_DBACCESS_DENIED_ERROR') throw e;
+    console.warn(`Warning: no CREATE DATABASE privilege, assuming '${MYSQL_DATABASE}' already exists.`);
+  }
   await conn.end();
 
   // Create connection pool

@@ -3,7 +3,7 @@
 module.exports = {
   apps: [
     {
-      name: 'heyi',
+      name: 'hitech-web',
       script: 'tsx',
       args: 'server.ts',
       cwd: __dirname,

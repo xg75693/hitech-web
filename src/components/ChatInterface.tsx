@@ -39,6 +39,7 @@ export default function ChatInterface() {
   const [leadSaved, setLeadSaved] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement>(null);
+  const base = import.meta.env.BASE_URL;
 
   // Initialize session and load history
   useEffect(() => {
@@ -50,7 +51,7 @@ export default function ChatInterface() {
     setSessionId(sid);
 
     // Load chat history
-    fetch(`/api/messages/${sid}`)
+    fetch(`${base}api/messages/${sid}`)
       .then((r) => r.json())
       .then((history: { role: string; content: string; created_at: string }[]) => {
         if (history.length > 0) {
@@ -89,7 +90,7 @@ export default function ChatInterface() {
     setIsLoading(true);
 
     try {
-      const chatResponse = await fetch("/api/chat", {
+      const chatResponse = await fetch(`${base}api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -190,7 +191,7 @@ export default function ChatInterface() {
           };
 
           try {
-            await fetch("/api/leads", {
+            await fetch(`${base}api/leads`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(newLead),
@@ -204,7 +205,7 @@ export default function ChatInterface() {
       }
     
       // Increment insights stat
-      await fetch("/api/stats/increment-insights", { method: "POST" });
+      await fetch(`${base}api/stats/increment-insights`, { method: "POST" });
     
     } catch (error) {
       console.error("Chat Error:", error);

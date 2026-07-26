@@ -26,11 +26,12 @@ export default function AdminPanel({ onBack }: { onBack: () => void }) {
   const [leadConversation, setLeadConversation] = useState<any[]>([]);
 
   const authHeaders = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
+  const base = import.meta.env.BASE_URL;
 
   // Verify token on mount
   useEffect(() => {
     if (token) {
-      fetch("/api/admin/verify", { headers: authHeaders })
+      fetch(`${base}api/admin/verify`, { headers: authHeaders })
         .then(r => { if (!r.ok) { setToken(null); localStorage.removeItem("admin_token"); } })
         .catch(() => { setToken(null); localStorage.removeItem("admin_token"); });
     }
@@ -45,13 +46,13 @@ export default function AdminPanel({ onBack }: { onBack: () => void }) {
     return () => clearInterval(interval);
   }, [token]);
 
-  const fetchLeads = () => fetch("/api/admin/leads", { headers: authHeaders }).then(r => r.json()).then(setLeads).catch(() => {});
-  const fetchCases = () => fetch("/api/admin/cases", { headers: authHeaders }).then(r => r.json()).then(setCases).catch(() => {});
+  const fetchLeads = () => fetch(`${base}api/admin/leads`, { headers: authHeaders }).then(r => r.json()).then(setLeads).catch(() => {});
+  const fetchCases = () => fetch(`${base}api/admin/cases`, { headers: authHeaders }).then(r => r.json()).then(setCases).catch(() => {});
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const r = await fetch("/api/admin/login", {
+      const r = await fetch(`${base}api/admin/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
@@ -68,29 +69,29 @@ export default function AdminPanel({ onBack }: { onBack: () => void }) {
   };
 
   const handleLogout = () => {
-    fetch("/api/admin/logout", { method: "POST", headers: authHeaders });
+    fetch(`${base}api/admin/logout`, { method: "POST", headers: authHeaders });
     setToken(null);
     localStorage.removeItem("admin_token");
   };
 
   const updateLead = async (id: string, data: any) => {
-    await fetch(`/api/admin/leads/${id}`, { method: "PUT", headers: authHeaders, body: JSON.stringify(data) });
+    await fetch(`${base}api/admin/leads/${id}`, { method: "PUT", headers: authHeaders, body: JSON.stringify(data) });
     fetchLeads();
     setEditingLead(null);
   };
 
   const deleteLead = async (id: string) => {
     if (confirm("确定删除该线索？")) {
-      await fetch(`/api/admin/leads/${id}`, { method: "DELETE", headers: authHeaders });
+      await fetch(`${base}api/admin/leads/${id}`, { method: "DELETE", headers: authHeaders });
       fetchLeads();
     }
   };
 
   const saveCase = async (data: any, id?: string) => {
     if (id) {
-      await fetch(`/api/admin/cases/${id}`, { method: "PUT", headers: authHeaders, body: JSON.stringify(data) });
+      await fetch(`${base}api/admin/cases/${id}`, { method: "PUT", headers: authHeaders, body: JSON.stringify(data) });
     } else {
-      await fetch("/api/admin/cases", { method: "POST", headers: authHeaders, body: JSON.stringify(data) });
+      await fetch(`${base}api/admin/cases`, { method: "POST", headers: authHeaders, body: JSON.stringify(data) });
     }
     fetchCases();
     setEditingCase(null);
@@ -99,13 +100,13 @@ export default function AdminPanel({ onBack }: { onBack: () => void }) {
 
   const deleteCase = async (id: string) => {
     if (confirm("确定删除该案例？")) {
-      await fetch(`/api/admin/cases/${id}`, { method: "DELETE", headers: authHeaders });
+      await fetch(`${base}api/admin/cases/${id}`, { method: "DELETE", headers: authHeaders });
       fetchCases();
     }
   };
 
   const togglePublish = async (c: any) => {
-    await fetch(`/api/admin/cases/${c.id}`, {
+    await fetch(`${base}api/admin/cases/${c.id}`, {
       method: "PUT", headers: authHeaders,
       body: JSON.stringify({ published: !c.published }),
     });
@@ -116,7 +117,7 @@ export default function AdminPanel({ onBack }: { onBack: () => void }) {
     if (expandedLead === leadId) { setExpandedLead(null); setLeadConversation([]); return; }
     setExpandedLead(leadId);
     try {
-      const r = await fetch(`/api/admin/leads/${leadId}/conversation`, { headers: authHeaders });
+      const r = await fetch(`${base}api/admin/leads/${leadId}/conversation`, { headers: authHeaders });
       const d = await r.json();
       setLeadConversation(d);
     } catch { setLeadConversation([]); }

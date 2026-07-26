@@ -9,11 +9,13 @@ export default function StatsDisplay() {
     active_sessions: 0
   });
 
+  const base = import.meta.env.BASE_URL;
+
   useEffect(() => {
     // Track this visitor
     const sessionId = localStorage.getItem("heyi_session_id") || "";
     if (sessionId) {
-      fetch("/api/visitors", {
+      fetch(`${base}api/visitors`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sessionId }),
@@ -22,7 +24,7 @@ export default function StatsDisplay() {
 
     const fetchStats = async () => {
       try {
-        const response = await fetch("/api/stats");
+        const response = await fetch(`${base}api/stats`);
         const data = await response.json();
         if (data) setStats(data);
       } catch (error) {

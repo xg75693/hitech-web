@@ -49,11 +49,12 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [funnel, setFunnel] = useState({ total_visitors: 0, total_consultations: 0, high_value_leads: 0 });
   const [logs, setLogs] = useState<{ event: string; detail: string; created_at: string }[]>([]);
+  const base = import.meta.env.BASE_URL;
 
   useEffect(() => {
     const fetchLeads = async () => {
       try {
-        const response = await fetch("/api/leads");
+        const response = await fetch(`${base}api/leads`);
         const data = await response.json();
         setLeads(data);
       } catch (error) {
@@ -65,7 +66,7 @@ export default function Dashboard() {
 
     const fetchFunnel = async () => {
       try {
-        const r = await fetch("/api/dashboard-stats");
+        const r = await fetch(`${base}api/dashboard-stats`);
         const d = await r.json();
         setFunnel({
           total_visitors: d.total_visitors || 0,
@@ -77,7 +78,7 @@ export default function Dashboard() {
 
     const fetchLogs = async () => {
       try {
-        const r = await fetch("/api/activity-logs");
+        const r = await fetch(`${base}api/activity-logs`);
         const data = await r.json();
         setLogs(data);
       } catch {}
