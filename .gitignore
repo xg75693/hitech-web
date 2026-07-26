@@ -1,0 +1,12 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# 本地数据库与工具配置
+heyi.db
+.claude/settings.local.json
