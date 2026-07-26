@@ -65,9 +65,9 @@ cp -rT ${TRUNK_DIR}/${APP_NAME} ${APP_DIR}
 echo "[3/5] 配置环境变量..."
 cd ${APP_DIR}
 
-# 若已有 .env 则跳过（保留生产配置）
-if [ ! -f .env ]; then
-  echo "❌ 未找到 .env 文件，请先创建并填写以下配置后重新执行："
+# 若已有 .env.production 则跳过（保留生产配置）
+if [ ! -f .env.production ]; then
+  echo "❌ 未找到 .env.production 文件，请先创建并填写以下配置后重新执行："
   echo "   ZHIPU_API_KEY=5a5645970077454294c60a66949938d5.PKlbntbtKliriadG"
   echo "   ZHIPU_MODEL=glm-4.5-air"
   echo "   MYSQL_HOST=127.0.0.1"
@@ -80,6 +80,8 @@ if [ ! -f .env ]; then
   echo "   PORT=3000"
   exit 1
 fi
+
+mv .env.production .env
 
 # ========================================
 # 4. 安装依赖 & 构建前端
