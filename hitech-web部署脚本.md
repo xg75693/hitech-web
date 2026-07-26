@@ -120,6 +120,21 @@ pm2 list
 
 echo "=== hitech-web 部署完成 - $(date '+%Y-%m-%d %H:%M:%S') ==="
 
+
+cp /data/hitech/node1/app/hitech-web/heyi.conf /etc/nginx/conf.d/heyi.conf
+cp /data/hitech/node1/app/hitech-web/heyi.conf.bak /etc/nginx/conf.d/heyi.conf
+cp /data/hitech/node1/app/hitech-web/heyi.conf /etc/nginx/conf.d/nginx.conf
+
+cat /data/hitech/node1/app/hitech-web/heyi.conf
+cat /etc/nginx/conf.d/heyi.conf
+cat /etc/nginx/conf.d/nginx.conf
+
+sudo nginx -t
+sudo systemctl stop nginx
+sudo systemctl start nginx
+sudo systemctl restart nginx
+sudo systemctl reload nginx
+
 # ========================================
 # 附录：离线部署说明（服务器无法访问 GitHub 时使用）
 # ========================================
