@@ -736,6 +736,7 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
+    app.get("/admin", (_req, res) => res.redirect(301, "/hitech/admin"));
     app.use("/hitech", express.static(path.join(__dirname, "dist")));
     app.use(express.static(path.join(__dirname, "dist")));
     app.get("*", (req, res) => {
