@@ -249,6 +249,12 @@ async function startServer() {
 
   app.use(express.json());
 
+  // 兼容未剥离 /hitech 前缀的代理请求
+  app.use((req, _res, next) => {
+    if (req.url.startsWith("/hitech/api/")) req.url = req.url.slice("/hitech".length);
+    next();
+  });
+
   // API Routes
   app.get("/api/stats", async (req, res) => {
     try {
@@ -730,6 +736,7 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
+    app.use("/hitech", express.static(path.join(__dirname, "dist")));
     app.use(express.static(path.join(__dirname, "dist")));
     app.get("*", (req, res) => {
       res.sendFile(path.join(__dirname, "dist", "index.html"));
