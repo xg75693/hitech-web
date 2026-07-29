@@ -4,8 +4,8 @@ module.exports = {
   apps: [
     {
       name: 'hitech-web',
-      script: 'tsx',
-      args: 'server.ts',
+      script: './server.ts',
+      interpreter: './node_modules/.bin/tsx',
       cwd: __dirname,
       instances: 1,
       autorestart: true,
