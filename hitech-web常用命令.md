@@ -1,3 +1,5 @@
+# 更新发布
+cd /data/hitech/node1/app/hitech-web && bash deploy.sh
 
 # ========================================
 # 附录：离线部署说明（服务器无法访问 GitHub 时使用）
