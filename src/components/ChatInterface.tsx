@@ -12,6 +12,18 @@ type Message = {
 
 type ChatState = "hook" | "exploration" | "scoring" | "action";
 
+// crypto.randomUUID 仅在安全上下文（HTTPS/localhost）可用，HTTP 访问需降级
+function genUUID(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = Array.from(bytes, b => b.toString(16).padStart(2, "0")).join("");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
 const WELCOME_MESSAGE: Message = {
   role: "assistant",
   content: "您好，我是和毅智能的数字合伙人。在这里，我们不只是交付代码，而是探索如何让硅基智能与您的团队和谐共生。在浏览我们的案例之前，我想先听听，在您理想的业务图景中，有哪些'人想做但做不到'的环节，是您最想用AI去重塑的？",
@@ -25,7 +37,7 @@ export default function ChatInterface() {
   const [chatState, setChatState] = useState<ChatState>("exploration");
   const [sessionId, setSessionId] = useState<string>("");
   const [leadData, setLeadData] = useState<any>({
-    id: crypto.randomUUID(),
+    id: genUUID(),
     industry: "",
     pain_point_raw: "",
     ai_cognition_score: 0,
@@ -45,7 +57,7 @@ export default function ChatInterface() {
   useEffect(() => {
     let sid = localStorage.getItem("heyi_session_id");
     if (!sid) {
-      sid = crypto.randomUUID();
+      sid = genUUID();
       localStorage.setItem("heyi_session_id", sid);
     }
     setSessionId(sid);
