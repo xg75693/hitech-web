@@ -1,6 +1,18 @@
 # 更新发布
 cd /data/hitech/node1/app/hitech-web && bash deploy.sh
 
+# 复制SSL证书
+## 创建SSL证书文件夹并复制
+mkdir -p /data/hitech/cert/
+cp /data/hitech/node1/app/hitech-web/ssl/ai.hitech.xin.* /data/hitech/cert/
+## 同时设置证书文件权限：
+chmod 600 /data/hitech/cert/ai.hitech.xin.key
+chmod 644 /data/hitech/cert/ai.hitech.xin.pem
+## 复制完成后，验证文件存在：
+ls -la /data/hitech/cert/
+## 然后重载 nginx：
+sudo nginx -t && sudo nginx -s reload
+
 # ========================================
 # 附录：离线部署说明（服务器无法访问 GitHub 时使用）
 # ========================================
