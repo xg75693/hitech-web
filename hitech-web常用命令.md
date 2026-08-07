@@ -2,6 +2,8 @@
 cd /data/hitech/node1/app/hitech-web && bash deploy.sh
 
 # 复制SSL证书
+## 更新Nginx配置
+\cp -f /data/hitech/node1/app/hitech-web/nginx.conf /etc/nginx/conf.d/nginx.conf
 ## 创建SSL证书文件夹并复制
 mkdir -p /data/hitech/cert/
 cp /data/hitech/node1/app/hitech-web/ssl/ai.hitech.xin.* /data/hitech/cert/
@@ -12,6 +14,13 @@ chmod 644 /data/hitech/cert/ai.hitech.xin.pem
 ls -la /data/hitech/cert/
 ## 然后重载 nginx：
 sudo nginx -t && sudo nginx -s reload
+
+# 更新Nginx配置
+cd /data/hitech/node1/app/hitech-web
+git pull origin main
+\cp nginx.conf /etc/nginx/conf.d/nginx.conf
+nginx -t && nginx -s reload
+
 
 # ========================================
 # 附录：离线部署说明（服务器无法访问 GitHub 时使用）
