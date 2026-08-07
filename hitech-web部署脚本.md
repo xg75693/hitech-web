@@ -109,10 +109,10 @@ echo "=== hitech-web 部署完成 - $(date '+%Y-%m-%d %H:%M:%S') ==="
 # 7. 更新 Nginx 站点配置（统一使用 conf.d/nginx.conf）
 # ========================================
 # 使用 \cp -f 绕过 root 的 cp -i 别名，强制覆盖不询问
-\cp -f /data/hitech/node1/app/hitech-web/nginx.conf /etc/nginx/conf.d/nginx.conf
+### \cp -f /data/hitech/node1/app/hitech-web/nginx.conf /etc/nginx/conf.d/nginx.conf
 
 # 清理历史遗留的重复配置（避免 server name 冲突警告）
-rm -f /etc/nginx/conf.d/heyi.conf
+### rm -f /etc/nginx/conf.d/heyi.conf
 
 sudo nginx -t && sudo systemctl reload nginx
 
