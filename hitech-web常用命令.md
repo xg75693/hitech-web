@@ -21,6 +21,10 @@ git pull origin main
 \cp nginx.conf /etc/nginx/conf.d/nginx.conf
 nginx -t && nginx -s reload
 
+## 手动启动服务
+cd /data/hitech/node1/app/hitech-web
+NODE_ENV=production pm2 start ecosystem.config.cjs
+pm2 save
 
 # ========================================
 # 附录：离线部署说明（服务器无法访问 GitHub 时使用）
