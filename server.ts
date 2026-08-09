@@ -179,8 +179,30 @@ async function initDatabase() {
     )
   `);
 
+  // 法律页面表（隐私政策、服务条款），后台可维护
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS legal_pages (
+      page_key VARCHAR(50) PRIMARY KEY,
+      title VARCHAR(255) NOT NULL,
+      content MEDIUMTEXT NOT NULL,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )
+  `);
+
   // Insert initial stats if not exists
   await pool.query(`INSERT IGNORE INTO stats (id, insights_generated, leads_captured, active_sessions) VALUES (1, 0, 0, 0)`);
+
+  // 初始化法律页面（已存在则保留后台编辑过的内容）
+  await pool.query(`INSERT IGNORE INTO legal_pages (page_key, title, content) VALUES (?, ?, ?)`, [
+    "privacy",
+    "隐私政策",
+    `# 隐私政策\n\n最后更新日期：2026年8月9日\n\n苏州和毅智能科技有限公司（以下简称"我们"）深知个人信息对您的重要性，我们将按照《中华人民共和国个人信息保护法》《网络安全法》等相关法律法规，保护您的个人信息。本政策适用于您通过本网站及我们的AI智能对话服务与我们的交互。\n\n## 一、我们收集的信息\n\n1. **您主动提供的信息**：在与数字合伙人的对话中，您可能主动提供的姓名、称呼、联系方式（电话、邮箱、微信等）、所在行业、业务需求与痛点描述等。\n2. **自动收集的信息**：当您访问本网站时，我们可能通过Cookie或类似技术自动收集您的访问日志、IP地址、浏览器类型、设备信息、页面浏览行为等。\n3. **对话内容**：您与AI助手的对话文本，用于提供咨询答复、理解需求并改进服务质量。\n\n## 二、我们如何使用信息\n\n1. 为您提供智能咨询与业务解答服务；\n2. 在您留下联系方式后，由我们的业务人员与您联系、跟进需求并提供方案；\n3. 分析与改进我们的产品、服务及AI模型效果；\n4. 保障服务安全、防范欺诈与滥用。\n\n我们不会将您的个人信息用于本政策未载明的其他用途。\n\n## 三、第三方服务\n\n为提供AI对话能力，我们可能将您的对话内容传输至第三方大模型服务提供商（如智谱AI）进行语义理解与回复生成。我们要求第三方在处理过程中遵守保密与数据安全义务。我们可能使用第三方统计分析服务以了解网站使用情况。\n\n## 四、信息共享与披露\n\n除以下情形外，我们不会向第三方共享或披露您的个人信息：\n1. 获得您的明确同意；\n2. 为完成您要求的业务跟进而必要；\n3. 法律法规要求或行政、司法机关依法要求。\n\n## 五、信息安全\n\n我们采取合理的技术与管理措施（如访问控制、加密传输）保护您的信息安全，但请理解，互联网传输不存在绝对安全。\n\n## 六、您的权利\n\n您有权访问、更正、删除您的个人信息，或撤回授权。如需行使上述权利，请通过本政策末尾的联系方式与我们联系。\n\n## 七、未成年人\n\n本网站面向企业客户与成年用户。若您是未满18周岁的未成年人，请在监护人陪同下使用并勿主动提供个人信息。\n\n## 八、政策更新\n\n我们可能适时修订本政策，更新后将在本页面公示。重大变更将通过网站公告或合理方式告知您。\n\n## 九、联系我们\n\n如对本政策有任何疑问，请联系：chenqinsi@hitech.xin。`
+  ]);
+  await pool.query(`INSERT IGNORE INTO legal_pages (page_key, title, content) VALUES (?, ?, ?)`, [
+    "terms",
+    "服务条款",
+    `# 服务条款\n\n最后更新日期：2026年8月9日\n\n欢迎访问苏州和毅智能科技有限公司（以下简称"我们"）运营的网站及AI智能对话服务。请您在使用前仔细阅读本服务条款，使用即视为您已理解并同意本条款。\n\n## 一、服务说明\n\n我们通过网站为您提供AI智能咨询、业务需求沟通、案例展示及相关信息服务。对话内容由AI模型生成，可能存在不准确或不完善之处，仅供您参考，不构成专业意见或承诺。\n\n## 二、接受条款\n\n您访问或使用本网站及服务，即表示您同意受本条款约束。若您不同意任一条款，请停止使用。\n\n## 三、用户行为规范\n\n您承诺不利用本服务从事以下行为：\n1. 发布或传输违法、侵权、欺诈、骚扰或破坏性内容；\n2. 冒用他人身份或提供虚假信息；\n3. 以任何方式干扰、破坏服务正常运行或试图未授权访问；\n4. 试图通过技术手段逆向工程、抓取大量数据或攻击系统。\n\n## 四、知识产权\n\n本网站的文本、图片、标识、案例、软件等内容的知识产权归我们或相关权利人所有，未经书面许可不得复制、转载、传播或用于商业用途。您在对话中提供的内容，您享有权利并授权我们为提供服务与改进之目的进行使用。\n\n## 五、免责声明\n\n1. AI生成内容可能存在错误，我们不对其准确性、完整性作保证，您应自行判断；\n2. 因网络故障、系统维护、第三方服务中断等原因导致服务不可用，我们不承担由此造成的损失；\n3. 本网站可能包含指向第三方的链接，我们对第三方内容与服务不承担责任。\n\n## 六、责任限制\n\n在法律允许的范围内，因使用本服务产生的任何直接或间接损失，我们的责任以实际收到的服务费用为限；若您未支付费用，则不承担赔偿责任。\n\n## 七、服务变更与终止\n\n我们可随时变更、暂停或终止部分或全部服务，并将尽量提前公告。若您违反本条款，我们有权限制或终止对您的服务。\n\n## 八、争议解决与适用法律\n\n本条款的解释与争议适用中华人民共和国法律。因本条款或服务产生的争议，双方应友好协商；协商不成的，可向我们住所地有管辖权的人民法院提起诉讼。\n\n## 九、联系方式\n\n如有任何疑问，请联系：chenqinsi@hitech.xin。`
+  ]);
 
   // Seed cases if empty
   const [caseCount] = await pool.query("SELECT COUNT(*) as cnt FROM cases");
@@ -283,6 +305,22 @@ async function startServer() {
         total_score, narrative_value_tags, contact_info, contact_name, contact_method, source,
         conversation_summary
       } = req.body;
+
+      // 按 session_id 去重：同一会话已有 lead 则更新，避免重新挂载后重复插入
+      const [existing] = await pool.query(
+        "SELECT id FROM leads WHERE session_id = ? LIMIT 1",
+        [session_id]
+      );
+
+      if (existing.length > 0) {
+        await pool.query(
+          `UPDATE leads SET industry=?, pain_point_raw=?, ai_cognition_score=?, narrative_value_score=?, total_score=?, narrative_value_tags=?, contact_info=?, contact_name=?, contact_method=?, conversation_summary=?, updated_at=NOW() WHERE session_id=?`,
+          [industry, pain_point_raw, ai_cognition_score || 0, narrative_value_score || 0,
+           total_score || 0, JSON.stringify(narrative_value_tags || []), contact_info, contact_name, contact_method,
+           JSON.stringify(conversation_summary || {}), session_id]
+        );
+        return res.json({ success: true, updated: true });
+      }
 
       await pool.query(
         `INSERT INTO leads (id, session_id, industry, pain_point_raw, ai_cognition_score, narrative_value_score, total_score, narrative_value_tags, contact_info, contact_name, contact_method, source, conversation_summary)
@@ -468,6 +506,28 @@ async function startServer() {
   }
 
   // Get chat history for a session
+  // Public: legal pages (privacy / terms)
+  app.get("/api/legal", async (_req, res) => {
+    try {
+      const [rows] = await pool.query("SELECT page_key, title, content, updated_at FROM legal_pages ORDER BY page_key");
+      res.json(rows);
+    } catch (err) {
+      console.error("Legal pages query error:", err);
+      res.status(500).json({ error: "Database error" });
+    }
+  });
+
+  app.get("/api/legal/:key", async (req, res) => {
+    try {
+      const [rows] = await pool.query("SELECT page_key, title, content, updated_at FROM legal_pages WHERE page_key = ?", [req.params.key]);
+      if ((rows as any[]).length === 0) return res.status(404).json({ error: "Not found" });
+      res.json((rows as any[])[0]);
+    } catch (err) {
+      console.error("Legal page query error:", err);
+      res.status(500).json({ error: "Database error" });
+    }
+  });
+
   app.get("/api/messages/:sessionId", async (req, res) => {
     try {
       const [rows] = await pool.query(
@@ -520,6 +580,7 @@ async function startServer() {
         4. 绝对不要自称为“合一数智”或其他名称，你的名字是“和毅智能数字合伙人”。
         5. 当用户询问公司资质、经营范围或成立时间等信息时，请根据背景信息中的营业执照内容准确回答。
         6. 当用户咨询的场景与案例库中的案例相似时，请自然地引用相关案例来说明我们的能力和成功经验，增强说服力。
+        7. 回答风格控制：寒暄阶段可适度礼貌回应；一旦客户描述了具体的业务场景、痛点或需求，后续回答必须简明扼要、直击要点——不要重复客套话和冗长铺垫，不要每条都加“很高兴为您服务”之类的话术，单次回复聚焦一个核心要点，能用两三句话说清就不要写成一段。
               
         当前线索数据: ${JSON.stringify(leadData)}
               
@@ -724,6 +785,27 @@ async function startServer() {
       await pool.query("DELETE FROM cases WHERE id = ?", [req.params.id]);
       res.json({ success: true });
     } catch (err) {
+      res.status(500).json({ error: "Database error" });
+    }
+  });
+
+  // Admin: legal pages management
+  app.get("/api/admin/legal", requireAdmin, async (_req, res) => {
+    try {
+      const [rows] = await pool.query("SELECT page_key, title, content, updated_at FROM legal_pages ORDER BY page_key");
+      res.json(rows);
+    } catch (err) {
+      res.status(500).json({ error: "Database error" });
+    }
+  });
+
+  app.put("/api/admin/legal/:key", requireAdmin, async (req, res) => {
+    try {
+      const { title, content } = req.body;
+      await pool.query("UPDATE legal_pages SET title = ?, content = ? WHERE page_key = ?", [title, content, req.params.key]);
+      res.json({ success: true });
+    } catch (err) {
+      console.error("Legal page update error:", err);
       res.status(500).json({ error: "Database error" });
     }
   });

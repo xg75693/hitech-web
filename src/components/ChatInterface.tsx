@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Send, User, Bot, Loader2, Sparkles, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Send, User, Bot, Loader2, Sparkles, AlertCircle, CheckCircle2, Mic, Square } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "../lib/utils";
@@ -26,7 +26,8 @@ function genUUID(): string {
 
 const WELCOME_MESSAGE: Message = {
   role: "assistant",
-  content: "您好，我是和毅智能的数字合伙人。在这里，我们不只是交付代码，而是探索如何让硅基智能与您的团队和谐共生。在浏览我们的案例之前，我想先听听，在您理想的业务图景中，有哪些'人想做但做不到'的环节，是您最想用AI去重塑的？",
+  content:
+    "您好，我是和毅智能的数字合伙人。\n和毅智能成立于2018年，是一家专注于软件开发、技术服务和AI智能体交付及运维的科技企业。我们的核心能力：为企业提供定制化软件开发服务，从需求分析到系统交付，覆盖企业级应用、移动应用和Web平台开发。在这里，我们不只是交付代码，而是探索如何让硅基智能与您的团队和谐共生。\n在浏览我们的案例之前，我想先听听，在您理想的业务图景中，有哪些'人想做但做不到'的环节，是您最想用AI去重塑的？",
   timestamp: 0,
 };
 
@@ -50,6 +51,44 @@ export default function ChatInterface() {
   });
   const [leadSaved, setLeadSaved] = useState(false);
 
+  // 语音输入（Web Speech API，Chrome/Edge 原生支持）
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+  const recognizedBaseRef = useRef<string>("");
+  const speechSupported =
+    typeof window !== "undefined" &&
+    !!((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);
+
+  const toggleListening = () => {
+    if (!speechSupported) return;
+    if (isListening) {
+      recognitionRef.current?.stop();
+      return;
+    }
+    const SR =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const rec = new SR();
+    rec.lang = "zh-CN";
+    rec.continuous = true;
+    rec.interimResults = true;
+    recognizedBaseRef.current = input; // 保留已有输入，识别结果追加在其后
+    rec.onresult = (e: any) => {
+      let interim = "";
+      let final = "";
+      for (let i = 0; i < e.results.length; i++) {
+        const r = e.results[i];
+        if (r.isFinal) final += r[0].transcript;
+        else interim += r[0].transcript;
+      }
+      setInput((recognizedBaseRef.current ? recognizedBaseRef.current : "") + final + interim);
+    };
+    rec.onend = () => setIsListening(false);
+    rec.onerror = () => setIsListening(false);
+    rec.start();
+    recognitionRef.current = rec;
+    setIsListening(true);
+  };
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const base = import.meta.env.BASE_URL;
 
@@ -72,7 +111,13 @@ export default function ChatInterface() {
             content: m.content,
             timestamp: new Date(m.created_at).getTime() || i,
           }));
-          setMessages(loaded);
+          // 欢迎语不存库，重新挂载加载历史时需在顶部补回；
+          // 仅当历史首条不是该欢迎语时才补，避免重复
+          const hasWelcome =
+            loaded[0].role === "assistant" && loaded[0].content === WELCOME_MESSAGE.content;
+          setMessages(
+            hasWelcome ? loaded : [{ ...WELCOME_MESSAGE, timestamp: 0 }, ...loaded]
+          );
         } else {
           setMessages([{ ...WELCOME_MESSAGE, timestamp: Date.now() }]);
         }
@@ -90,6 +135,10 @@ export default function ChatInterface() {
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
+    // 发送时若仍在录音，先停止
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop();
+    }
 
     const userMessage: Message = {
       role: "user",
@@ -133,9 +182,10 @@ export default function ChatInterface() {
         setChatState("scoring");
       }
 
-      // Auto-save lead ONLY when real contact info is detected
-      if (chatState === "scoring" && !leadSaved) {
-        const contactPattern = /(1[3-9]\d{9})|([\w.-]+@[\w.-]+\.[a-zA-Z]{2,})|(微信[：:号]?\s*[a-zA-Z0-9_-]{3,})|(wxid_[\w]+)/i;
+      // Auto-save lead whenever real contact info is detected (independent of chatState,
+      // so a lead is captured even if the visitor stops talking right after sharing contact)
+      if (!leadSaved) {
+        const contactPattern = /(1[3-9]\d{9})|(0\d{2,3}-?\d{7,8})|((?:电话|手机|号码|联系|致电)[^0-9]{0,6}\d{7,12})|([\w.-]+@[\w.-]+\.[a-zA-Z]{2,})|(微信[：:号]?\s*[a-zA-Z0-9_-]{3,})|(wxid_[\w]+)/i;
         
         // Search all messages (including current input) for contact info
         const allTexts = [...messages.map(m => m.content), input];
@@ -146,7 +196,7 @@ export default function ChatInterface() {
           const match = text.match(contactPattern);
           if (match) {
             contactInfo = match[0];
-            contactMethod = /1[3-9]\d{9}/.test(contactInfo) ? "phone"
+            contactMethod = /\d{7,}/.test(contactInfo) ? "phone"
               : /@/.test(contactInfo) ? "email"
               : "wechat";
             break;
@@ -294,9 +344,21 @@ export default function ChatInterface() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            placeholder={chatState === "scoring" ? "请留下您的联系方式（微信/电话）..." : "描述您的业务痛点或愿景..."}
+            placeholder={isListening ? "正在聆听…点击麦克风结束" : chatState === "scoring" ? "请留下您的联系方式（微信/电话）..." : "描述您的业务痛点或愿景…"}
             className="flex-1 bg-[#F5F5F5] border border-[#141414]/10 px-4 py-3 text-sm focus:outline-none focus:border-[#141414] transition-colors"
           />
+          <button
+            onClick={toggleListening}
+            disabled={!speechSupported}
+            title={speechSupported ? (isListening ? "停止语音输入" : "语音输入") : "当前浏览器不支持语音输入，请用 Chrome/Edge"}
+            className={`px-3 py-3 flex items-center justify-center border transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
+              isListening
+                ? "bg-red-500 text-white border-red-500 animate-pulse"
+                : "bg-[#F5F5F5] text-[#141414] border-[#141414]/10 hover:border-[#141414]"
+            }`}
+          >
+            {isListening ? <Square size={16} /> : <Mic size={16} />}
+          </button>
           <button
             onClick={handleSend}
             disabled={isLoading || !input.trim()}

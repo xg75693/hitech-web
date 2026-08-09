@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Lock, LogOut, Users, Briefcase, Plus, Trash2, Edit3, Save, X, Eye, EyeOff, MessageSquare, ChevronDown, ChevronUp, Phone, Mail, MessageCircle, Clock } from "lucide-react";
+import { Lock, LogOut, Users, Briefcase, Plus, Trash2, Edit3, Save, X, Eye, EyeOff, MessageSquare, ChevronDown, ChevronUp, Phone, Mail, MessageCircle, Clock, FileText } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
 const FOLLOW_UP_STATUSES = [
@@ -16,11 +16,13 @@ export default function AdminPanel({ onBack }: { onBack: () => void }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState("");
-  const [tab, setTab] = useState<"leads" | "cases">("leads");
+  const [tab, setTab] = useState<"leads" | "cases" | "legal">("leads");
   const [leads, setLeads] = useState<any[]>([]);
   const [cases, setCases] = useState<any[]>([]);
+  const [legalPages, setLegalPages] = useState<any[]>([]);
   const [editingLead, setEditingLead] = useState<any>(null);
   const [editingCase, setEditingCase] = useState<any>(null);
+  const [editingLegal, setEditingLegal] = useState<any>(null);
   const [showNewCase, setShowNewCase] = useState(false);
   const [expandedLead, setExpandedLead] = useState<string | null>(null);
   const [leadConversation, setLeadConversation] = useState<any[]>([]);
@@ -42,12 +44,24 @@ export default function AdminPanel({ onBack }: { onBack: () => void }) {
     if (!token) return;
     fetchLeads();
     fetchCases();
-    const interval = setInterval(() => { fetchLeads(); fetchCases(); }, 10000);
+    fetchLegal();
+    const interval = setInterval(() => { fetchLeads(); fetchCases(); fetchLegal(); }, 10000);
     return () => clearInterval(interval);
   }, [token]);
 
   const fetchLeads = () => fetch(`${base}api/admin/leads`, { headers: authHeaders }).then(r => r.json()).then(setLeads).catch(() => {});
   const fetchCases = () => fetch(`${base}api/admin/cases`, { headers: authHeaders }).then(r => r.json()).then(setCases).catch(() => {});
+  const fetchLegal = () => fetch(`${base}api/admin/legal`, { headers: authHeaders }).then(r => r.json()).then(setLegalPages).catch(() => {});
+
+  const saveLegal = async (key: string, data: any) => {
+    await fetch(`${base}api/admin/legal/${key}`, {
+      method: "PUT",
+      headers: authHeaders,
+      body: JSON.stringify({ title: data.title, content: data.content }),
+    });
+    setEditingLegal(null);
+    fetchLegal();
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -184,6 +198,7 @@ export default function AdminPanel({ onBack }: { onBack: () => void }) {
           {[
             { key: "leads", label: "线索管理", icon: <Users size={14} />, count: leads.length },
             { key: "cases", label: "案例管理", icon: <Briefcase size={14} />, count: cases.length },
+            { key: "legal", label: "法律页面", icon: <FileText size={14} />, count: legalPages.length },
           ].map(t => (
             <button key={t.key} onClick={() => setTab(t.key as any)}
               className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all ${
@@ -484,6 +499,45 @@ export default function AdminPanel({ onBack }: { onBack: () => void }) {
                   </div>
                 </div>
               ))}
+            </motion.div>
+          )}
+
+          {/* Legal Tab */}
+          {tab === "legal" && (
+            <motion.div key="legal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
+              {legalPages.length === 0 ? (
+                <div className="bg-white border p-12 text-center opacity-50">暂无法律页面</div>
+              ) : (
+                legalPages.map((p) => (
+                  <div key={p.page_key} className="bg-white border border-[#141414]/10 p-5 space-y-3">
+                    {editingLegal?.page_key === p.page_key ? (
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-[10px] uppercase opacity-50">页面标题</label>
+                          <input value={editingLegal.title} onChange={(e) => setEditingLegal({ ...editingLegal, title: e.target.value })} className="w-full border px-3 py-2 text-sm mt-1" />
+                        </div>
+                        <div>
+                          <label className="text-[10px] uppercase opacity-50">正文（支持 Markdown，# 为标题）</label>
+                          <textarea value={editingLegal.content} onChange={(e) => setEditingLegal({ ...editingLegal, content: e.target.value })} rows={18} className="w-full border px-3 py-2 text-sm mt-1 font-mono leading-relaxed" />
+                        </div>
+                        <div className="flex gap-2">
+                          <button onClick={() => saveLegal(p.page_key, editingLegal)} className="flex items-center gap-1 bg-green-600 text-white px-3 py-1 text-xs"><Save size={12}/> 保存</button>
+                          <button onClick={() => setEditingLegal(null)} className="flex items-center gap-1 border px-3 py-1 text-xs"><X size={12}/> 取消</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="space-y-1">
+                          <h3 className="font-bold text-sm">{p.title}</h3>
+                          <p className="text-[10px] font-mono opacity-40 uppercase">/{p.page_key} · 更新于 {p.updated_at ? new Date(p.updated_at).toLocaleString() : "-"}</p>
+                          <p className="text-xs opacity-60 line-clamp-2">{(p.content || "").replace(/[#*`>\-\n]/g, " ").slice(0, 120)}</p>
+                        </div>
+                        <button onClick={() => setEditingLegal({ ...p })} className="p-2 hover:bg-[#F5F5F5] transition-colors shrink-0"><Edit3 size={14}/></button>
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
             </motion.div>
           )}
         </AnimatePresence>

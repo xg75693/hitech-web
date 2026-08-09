@@ -22,6 +22,7 @@ import ChatInterface from "./components/ChatInterface";
 import Dashboard from "./components/Dashboard";
 import StatsDisplay from "./components/StatsDisplay";
 import AdminPanel from "./components/AdminPanel";
+import LegalPage from "./components/LegalPage";
 
 export default function App() {
   const [route, setRoute] = useState(window.location.pathname);
@@ -44,6 +45,12 @@ export default function App() {
   // Admin route
   if (route === `${base}admin`) {
     return <AdminPanel onBack={() => navigate(base)} />;
+  }
+
+  // Legal pages (privacy / terms)
+  if (route === `${base}privacy` || route === `${base}terms`) {
+    const pageKey = route === `${base}privacy` ? "privacy" : "terms";
+    return <LegalPage pageKey={pageKey} onBack={() => navigate(base)} />;
   }
   const [dashboardStats, setDashboardStats] = useState({
     insights_generated: 0,
@@ -307,16 +314,16 @@ export default function App() {
             <div className="space-y-2">
               <p className="text-[10px] font-bold uppercase tracking-widest">联系我们</p>
               <ul className="text-xs space-y-1 opacity-70">
-                <li>Twitter</li>
-                <li>LinkedIn</li>
-                <li>GitHub</li>
+                <li>
+                  <a href="mailto:chenqinsi@hitech.xin" className="hover:underline">chenqinsi@hitech.xin</a>
+                </li>
               </ul>
             </div>
             <div className="space-y-2">
               <p className="text-[10px] font-bold uppercase tracking-widest">法律条款</p>
               <ul className="text-xs space-y-1 opacity-70">
-                <li>隐私政策</li>
-                <li>服务条款</li>
+                <li><button onClick={() => navigate(`${base}privacy`)} className="hover:underline text-left">隐私政策</button></li>
+                <li><button onClick={() => navigate(`${base}terms`)} className="hover:underline text-left">服务条款</button></li>
               </ul>
             </div>
           </div>

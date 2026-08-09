@@ -96,10 +96,6 @@ export default function Dashboard() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#141414] pb-8">
         <div className="space-y-2">
-          <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest opacity-50">
-            <ShieldCheck size={12} />
-            内部访问权限 / 数字业务部
-          </div>
           <h2 className="text-5xl font-bold tracking-tighter uppercase">透明工厂 <span className="italic font-serif normal-case font-normal">&</span> 协作工作台</h2>
         </div>
         
