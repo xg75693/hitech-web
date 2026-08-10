@@ -26,6 +26,10 @@ cd /data/hitech/node1/app/hitech-web
 NODE_ENV=production pm2 start ecosystem.config.cjs
 pm2 save
 
+## 更新发布v2.0
+cd /data/hitech/node1/app/hitech-web
+git remote set-url origin https://ghfast.top/https://github.com/xg75693/hitech-web.git
+bash deploy.sh
 # ========================================
 # 附录：离线部署说明（服务器无法访问 GitHub 时使用）
 # ========================================
