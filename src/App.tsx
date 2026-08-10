@@ -42,16 +42,6 @@ export default function App() {
 
   const base = import.meta.env.BASE_URL;
 
-  // Admin route
-  if (route === `${base}admin`) {
-    return <AdminPanel onBack={() => navigate(base)} />;
-  }
-
-  // Legal pages (privacy / terms)
-  if (route === `${base}privacy` || route === `${base}terms`) {
-    const pageKey = route === `${base}privacy` ? "privacy" : "terms";
-    return <LegalPage pageKey={pageKey} onBack={() => navigate(base)} />;
-  }
   const [dashboardStats, setDashboardStats] = useState({
     insights_generated: 0,
     active_sessions: 0,
@@ -77,6 +67,17 @@ export default function App() {
     const interval = setInterval(fetchDashboard, 15000);
     return () => clearInterval(interval);
   }, []);
+
+  // Admin route
+  if (route === `${base}admin`) {
+    return <AdminPanel onBack={() => navigate(base)} />;
+  }
+
+  // Legal pages (privacy / terms)
+  if (route === `${base}privacy` || route === `${base}terms`) {
+    const pageKey = route === `${base}privacy` ? "privacy" : "terms";
+    return <LegalPage pageKey={pageKey} onBack={() => navigate(base)} />;
+  }
 
   return (
     <div className="min-h-screen bg-[#E4E3E0] text-[#141414] font-sans selection:bg-[#141414] selection:text-[#E4E3E0]">
