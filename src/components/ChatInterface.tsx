@@ -286,7 +286,7 @@ export default function ChatInterface() {
       {/* Messages Area */}
       <div 
         ref={scrollRef}
-        className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-[#141414]/10"
+        className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 scrollbar-thin scrollbar-thumb-[#141414]/10"
       >
         <AnimatePresence initial={false}>
           {messages.map((msg, i) => (
@@ -295,7 +295,7 @@ export default function ChatInterface() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className={cn(
-                "flex gap-4 max-w-[85%]",
+                "flex gap-3 sm:gap-4 max-w-[92%] sm:max-w-[85%]",
                 msg.role === "user" ? "ml-auto flex-row-reverse" : "mr-auto"
               )}
             >
@@ -306,7 +306,7 @@ export default function ChatInterface() {
                 {msg.role === "user" ? <User size={16} /> : <Bot size={16} />}
               </div>
               <div className={cn(
-                "p-4 rounded-sm text-sm leading-relaxed",
+                "p-3 sm:p-4 rounded-sm text-sm leading-relaxed min-w-0 break-words",
                 msg.role === "user" 
                   ? "bg-[#141414] text-white" 
                   : "bg-[#F5F5F5] border border-[#141414]/5"
@@ -345,13 +345,13 @@ export default function ChatInterface() {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
             placeholder={isListening ? "正在聆听…点击麦克风结束" : chatState === "scoring" ? "请留下您的联系方式（微信/电话）..." : "描述您的业务痛点或愿景…"}
-            className="flex-1 bg-[#F5F5F5] border border-[#141414]/10 px-4 py-3 text-sm focus:outline-none focus:border-[#141414] transition-colors"
+            className="flex-1 min-w-0 bg-[#F5F5F5] border border-[#141414]/10 px-4 py-3 text-sm focus:outline-none focus:border-[#141414] transition-colors"
           />
           <button
             onClick={toggleListening}
             disabled={!speechSupported}
             title={speechSupported ? (isListening ? "停止语音输入" : "语音输入") : "当前浏览器不支持语音输入，请用 Chrome/Edge"}
-            className={`px-3 py-3 flex items-center justify-center border transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
+            className={`px-3 py-3 shrink-0 flex items-center justify-center border transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
               isListening
                 ? "bg-red-500 text-white border-red-500 animate-pulse"
                 : "bg-[#F5F5F5] text-[#141414] border-[#141414]/10 hover:border-[#141414]"
@@ -362,13 +362,13 @@ export default function ChatInterface() {
           <button
             onClick={handleSend}
             disabled={isLoading || !input.trim()}
-            className="bg-[#141414] text-white px-6 py-3 flex items-center gap-2 hover:bg-[#141414]/90 disabled:opacity-50 transition-all"
+            className="bg-[#141414] text-white px-4 sm:px-6 py-3 shrink-0 flex items-center gap-2 hover:bg-[#141414]/90 disabled:opacity-50 transition-all"
           >
-            <Send size={16} />
-            <span className="text-xs font-bold uppercase tracking-widest">发送</span>
+            <Send size={16} className="shrink-0" />
+            <span className="hidden sm:inline text-xs font-bold uppercase tracking-widest whitespace-nowrap">发送</span>
           </button>
         </div>
-        <div className="mt-2 flex items-center justify-between">
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1 text-[10px] uppercase tracking-tighter opacity-50">
               <Sparkles size={10} />

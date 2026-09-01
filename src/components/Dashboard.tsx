@@ -99,7 +99,7 @@ export default function Dashboard() {
           <h2 className="text-5xl font-bold tracking-tighter uppercase">透明工厂 <span className="italic font-serif normal-case font-normal">&</span> 协作工作台</h2>
         </div>
         
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-4">
           <div className="border border-[#141414] px-4 py-2 bg-white flex items-center gap-4">
             <div className="flex items-center gap-2">
               <Activity size={14} className="text-green-500" />

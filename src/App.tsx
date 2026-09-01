@@ -83,27 +83,27 @@ export default function App() {
     <div className="min-h-screen bg-[#E4E3E0] text-[#141414] font-sans selection:bg-[#141414] selection:text-[#E4E3E0]">
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 border-b border-[#141414]/10 bg-[#E4E3E0]/80 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="和毅智能" className="w-10 h-10 object-contain rounded-sm border border-white/10" />
-            <div className="flex flex-col -space-y-1">
-              <span className="font-bold tracking-tighter text-lg uppercase">和毅欢迎您！</span>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <img src="/logo.png" alt="和毅智能" className="w-8 h-8 sm:w-10 sm:h-10 shrink-0 object-contain rounded-sm border border-white/10" />
+            <div className="flex flex-col -space-y-1 min-w-0">
+              <span className="font-bold tracking-tighter text-base sm:text-lg uppercase truncate">和毅欢迎您！</span>
             </div>
           </div>
-          
-          <div className="flex items-center gap-6">
-            <button 
+
+          <div className="flex items-center gap-3 sm:gap-6 shrink-0">
+            <button
               onClick={() => setView("public")}
-              className={`text-xs uppercase tracking-widest font-bold ${view === "public" ? "underline underline-offset-4" : "opacity-50 hover:opacity-100 transition-opacity"}`}
+              className={`text-[11px] sm:text-xs uppercase tracking-widest font-bold whitespace-nowrap ${view === "public" ? "underline underline-offset-4" : "opacity-50 hover:opacity-100 transition-opacity"}`}
             >
               官网首页
             </button>
-            <button 
+            <button
               onClick={() => setView("internal")}
-              className={`text-xs uppercase tracking-widest font-bold flex items-center gap-2 ${view === "internal" ? "underline underline-offset-4" : "opacity-50 hover:opacity-100 transition-opacity"}`}
+              className={`text-[11px] sm:text-xs uppercase tracking-widest font-bold flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${view === "internal" ? "underline underline-offset-4" : "opacity-50 hover:opacity-100 transition-opacity"}`}
             >
-              <Lock size={12} />
-              透明工厂 (Glass Box)
+              <Lock size={12} className="shrink-0" />
+              透明工厂<span className="hidden sm:inline"> (Glass Box)</span>
             </button>
           </div>
         </div>
@@ -201,18 +201,18 @@ export default function App() {
 
               {/* Case Library - full width */}
               <div className="lg:col-span-12 space-y-6 mt-8">
-                <div className="flex items-end justify-between">
+                <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
                   <div>
                     <p className="text-[10px] font-mono uppercase tracking-[0.3em] opacity-50 mb-1">Case Library</p>
                     <h2 className="text-3xl font-bold tracking-tight">成功案例库</h2>
                     <p className="text-sm opacity-60 mt-1">每一个案例，都是一次人机协作的叙事实验</p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     {["all", "制造业", "金融", "软件", "法律", "电商", "医疗"].map(ind => (
                       <button
                         key={ind}
                         onClick={() => setCaseFilter(ind)}
-                        className={`text-[10px] px-3 py-1 border transition-all ${
+                        className={`text-[10px] px-3 py-1 border transition-all whitespace-nowrap ${
                           caseFilter === ind ? "bg-[#141414] text-white border-[#141414]" : "border-[#141414]/30 hover:border-[#141414]"
                         }`}
                       >
