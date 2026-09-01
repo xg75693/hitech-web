@@ -10,6 +10,14 @@ dotenv.config();
 
 const ZHIPU_API_KEY = process.env.ZHIPU_API_KEY || "";
 const ZHIPU_MODEL = process.env.ZHIPU_MODEL || "glm-4-flash";
+
+// AI 接口默认走智谱 GLM；配置 AI_API_URL / AI_API_KEY / AI_MODEL 可切到其他
+// OpenAI 兼容网关（如内网网关），响应结构相同，无需改调用处。
+const AI_API_URL = process.env.AI_API_URL || "https://open.bigmodel.cn/api/paas/v4/chat/completions";
+const AI_API_KEY = process.env.AI_API_KEY || ZHIPU_API_KEY;
+const AI_MODEL = process.env.AI_MODEL || ZHIPU_MODEL;
+// 思考型模型的推理过程也计入该额度，切换模型时可能需要调高
+const AI_MAX_TOKENS = parseInt(process.env.AI_MAX_TOKENS || "1024");
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin";
 
@@ -312,7 +320,7 @@ async function startServer() {
         [session_id]
       );
 
-      if (existing.length > 0) {
+      if ((existing as any[]).length > 0) {
         await pool.query(
           `UPDATE leads SET industry=?, pain_point_raw=?, ai_cognition_score=?, narrative_value_score=?, total_score=?, narrative_value_tags=?, contact_info=?, contact_name=?, contact_method=?, conversation_summary=?, updated_at=NOW() WHERE session_id=?`,
           [industry, pain_point_raw, ai_cognition_score || 0, narrative_value_score || 0,
@@ -587,20 +595,20 @@ async function startServer() {
         请使用中文回答。
       `;
 
-      const zhipuResponse = await fetchWithRetry("https://open.bigmodel.cn/api/paas/v4/chat/completions", {
+      const zhipuResponse = await fetchWithRetry(AI_API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${ZHIPU_API_KEY}`,
+          "Authorization": `Bearer ${AI_API_KEY}`,
         },
         body: JSON.stringify({
-          model: ZHIPU_MODEL,
+          model: AI_MODEL,
           messages: [
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt },
           ],
           temperature: 0.7,
-          max_tokens: 1024,
+          max_tokens: AI_MAX_TOKENS,
         }),
       });
 
