@@ -261,15 +261,15 @@ export default function App() {
                           >
                             <div>
                               <p className="text-[9px] font-mono uppercase opacity-40 mb-1">挑战</p>
-                              <p className="text-[11px] leading-relaxed">{c.challenge}</p>
+                              <p className="text-[11px] leading-relaxed whitespace-pre-wrap break-words">{c.challenge}</p>
                             </div>
                             <div>
                               <p className="text-[9px] font-mono uppercase opacity-40 mb-1">方案</p>
-                              <p className="text-[11px] leading-relaxed">{c.solution}</p>
+                              <p className="text-[11px] leading-relaxed whitespace-pre-wrap break-words">{c.solution}</p>
                             </div>
                             <div>
                               <p className="text-[9px] font-mono uppercase opacity-40 mb-1">成果</p>
-                              <p className="text-[11px] leading-relaxed font-semibold text-green-700">{c.result}</p>
+                              <p className="text-[11px] leading-relaxed font-semibold text-green-700 whitespace-pre-wrap break-words">{c.result}</p>
                             </div>
                           </motion.div>
                         )}
